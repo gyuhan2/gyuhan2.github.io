@@ -1,7 +1,9 @@
 document.addEventListener('DOMContentLoaded', () => {
   setupNavigation();
-  setupMatrixBackground();
+  setupSummerBackground();
+  setupRandomProjectCard();
   setupSnakeGame();
+  setupMinesweeperGame();
 });
 
 function setupNavigation() {
@@ -31,15 +33,18 @@ function setupNavigation() {
   });
 }
 
-function setupMatrixBackground() {
+function setupSummerBackground() {
   const canvas = document.getElementById('matrix-canvas');
   if (!(canvas instanceof HTMLCanvasElement)) return;
   const ctx = canvas.getContext('2d');
   if (!ctx) return;
 
-  const chars = '01ABCDEFGHIJKLMNOPQRSTUVWXYZ#$%*'.split('');
-  const fontSize = 18;
-  let columns = [];
+  const clouds = [];
+  const waves = [
+    { y: 0.76, amplitude: 10, speed: 0.028, phase: 0 },
+    { y: 0.83, amplitude: 14, speed: 0.02, phase: 1.7 },
+    { y: 0.9, amplitude: 18, speed: 0.016, phase: 3.2 }
+  ];
   let width = 0;
   let height = 0;
   let dpr = window.devicePixelRatio || 1;
@@ -53,36 +58,129 @@ function setupMatrixBackground() {
     canvas.style.width = `${width}px`;
     canvas.style.height = `${height}px`;
     ctx.setTransform(dpr, 0, 0, dpr, 0, 0);
-    columns = Array.from({ length: Math.ceil(width / fontSize) }, () => Math.floor(Math.random() * 40));
+    clouds.length = 0;
+    const cloudCount = width < 700 ? 3 : 5;
+    for (let i = 0; i < cloudCount; i += 1) {
+      clouds.push({
+        x: Math.random() * width,
+        y: height * (0.12 + Math.random() * 0.22),
+        size: 50 + Math.random() * 80,
+        speed: 0.18 + Math.random() * 0.24
+      });
+    }
   };
 
   resize();
   window.addEventListener('resize', resize);
 
-  const render = () => {
-    ctx.fillStyle = 'rgba(2, 8, 5, 0.15)';
-    ctx.fillRect(0, 0, width, height);
-    ctx.font = `bold ${fontSize}px "Segoe UI", sans-serif`;
-    ctx.textBaseline = 'top';
+  const drawCloud = (cloud) => {
+    ctx.save();
+    ctx.globalAlpha = 0.88;
+    ctx.fillStyle = 'rgba(255, 255, 255, 0.85)';
+    const pieces = [
+      [0, 0.08, 0.42],
+      [0.24, -0.1, 0.5],
+      [0.46, 0, 0.58],
+      [0.7, 0.09, 0.42]
+    ];
+    pieces.forEach(([px, py, pr]) => {
+      ctx.beginPath();
+      ctx.arc(cloud.x + cloud.size * px, cloud.y + cloud.size * py, cloud.size * pr * 0.22, 0, Math.PI * 2);
+      ctx.fill();
+    });
+    ctx.restore();
+  };
 
-    columns.forEach((drop, columnIndex) => {
-      const char = chars[Math.floor(Math.random() * chars.length)];
-      const x = columnIndex * fontSize;
-      const y = drop * fontSize;
-      ctx.fillStyle = columnIndex % 7 === 0 ? 'rgba(219, 255, 231, 0.98)' : 'rgba(114, 255, 158, 0.82)';
-      ctx.fillText(char, x, y);
-
-      if (y > height && Math.random() > 0.975) {
-        columns[columnIndex] = 0;
+  const drawWaveLine = (wave, time) => {
+    ctx.beginPath();
+    const baseY = height * wave.y;
+    for (let x = 0; x <= width; x += 20) {
+      const y = baseY + Math.sin((x * 0.018) + time * wave.speed + wave.phase) * wave.amplitude;
+      if (x === 0) {
+        ctx.moveTo(x, y);
       } else {
-        columns[columnIndex] = drop + 1;
+        ctx.lineTo(x, y);
       }
+    }
+    ctx.stroke();
+  };
+
+  const render = () => {
+    const time = Date.now() / 1000;
+    const sky = ctx.createLinearGradient(0, 0, 0, height);
+    sky.addColorStop(0, '#8fdcff');
+    sky.addColorStop(0.45, '#d9f6ff');
+    sky.addColorStop(0.67, '#82ddf0');
+    sky.addColorStop(0.82, '#ffdca2');
+    sky.addColorStop(1, '#f2b56f');
+    ctx.fillStyle = sky;
+    ctx.fillRect(0, 0, width, height);
+
+    ctx.fillStyle = 'rgba(255, 235, 170, 0.9)';
+    ctx.beginPath();
+    ctx.arc(width * 0.8, height * 0.18, Math.min(width, height) * 0.08, 0, Math.PI * 2);
+    ctx.fill();
+    ctx.fillStyle = 'rgba(255, 248, 220, 0.38)';
+    ctx.beginPath();
+    ctx.arc(width * 0.8, height * 0.18, Math.min(width, height) * 0.15, 0, Math.PI * 2);
+    ctx.fill();
+
+    const seaTop = height * 0.66;
+    const sea = ctx.createLinearGradient(0, seaTop, 0, height);
+    sea.addColorStop(0, 'rgba(63, 185, 214, 0.8)');
+    sea.addColorStop(1, 'rgba(16, 90, 139, 0.92)');
+    ctx.fillStyle = sea;
+    ctx.fillRect(0, seaTop, width, height - seaTop);
+
+    const sand = ctx.createLinearGradient(0, height * 0.84, 0, height);
+    sand.addColorStop(0, 'rgba(255, 232, 178, 0.95)');
+    sand.addColorStop(1, 'rgba(245, 182, 113, 0.98)');
+    ctx.fillStyle = sand;
+    ctx.fillRect(0, height * 0.86, width, height * 0.14);
+
+    ctx.strokeStyle = 'rgba(255, 255, 255, 0.52)';
+    ctx.lineWidth = 2;
+    waves.forEach((wave) => drawWaveLine(wave, time));
+
+    ctx.strokeStyle = 'rgba(255, 255, 255, 0.3)';
+    ctx.lineWidth = 1.4;
+    clouds.forEach((cloud) => {
+      cloud.x += cloud.speed;
+      if (cloud.x > width + cloud.size) {
+        cloud.x = -cloud.size * 1.4;
+        cloud.y = height * (0.1 + Math.random() * 0.18);
+      }
+      drawCloud(cloud);
     });
 
     requestAnimationFrame(render);
   };
 
   requestAnimationFrame(render);
+}
+
+function setupRandomProjectCard() {
+  const title = document.getElementById('project-title');
+  const description = document.getElementById('project-description');
+  if (!(title instanceof HTMLElement) || !(description instanceof HTMLElement)) return;
+
+  const projects = [
+    {
+      title: 'Ocean Drift Dashboard',
+      description: '파도처럼 부드럽게 흐르는 정적 대시보드 컨셉입니다.'
+    },
+    {
+      title: 'Sunset Signal Notes',
+      description: '여름 저녁 분위기의 기록형 프로젝트 샘플입니다.'
+    },
+    {
+      title: 'Palm Breeze Tracker',
+      description: '휴가철 일정과 메모를 상정한 랜덤 샘플 프로젝트입니다.'
+    }
+  ];
+  const choice = projects[Math.floor(Math.random() * projects.length)];
+  title.textContent = choice.title;
+  description.textContent = choice.description;
 }
 
 function setupSnakeGame() {
@@ -682,4 +780,304 @@ function setupSnakeGame() {
   }
 
   initialize();
+}
+
+function setupMinesweeperGame() {
+  const board = document.getElementById('minesweeper-board');
+  const mineSelect = document.getElementById('mine-count-select');
+  const newBtn = document.getElementById('minesweeper-new-btn');
+  const openBtn = document.getElementById('minesweeper-open-btn');
+  const flagBtn = document.getElementById('minesweeper-flag-btn');
+  const mineLeftValue = document.getElementById('mine-left-value');
+  const revealedValue = document.getElementById('revealed-value');
+  const statusValue = document.getElementById('ms-status-value');
+
+  if (
+    !(board instanceof HTMLElement) ||
+    !(mineSelect instanceof HTMLSelectElement) ||
+    !(newBtn instanceof HTMLButtonElement) ||
+    !(openBtn instanceof HTMLButtonElement) ||
+    !(flagBtn instanceof HTMLButtonElement) ||
+    !(mineLeftValue instanceof HTMLElement) ||
+    !(revealedValue instanceof HTMLElement) ||
+    !(statusValue instanceof HTMLElement)
+  ) {
+    return;
+  }
+
+  const SIZE = 20;
+  const CELL_TOTAL = SIZE * SIZE;
+  const state = {
+    mineCount: Number(mineSelect.value) || 5,
+    actionMode: 'open',
+    firstReveal: true,
+    gameOver: false,
+    won: false,
+    revealed: 0,
+    flags: 0,
+    mines: new Set(),
+    counts: Array.from({ length: SIZE }, () => Array(SIZE).fill(0)),
+    opened: new Set(),
+    flagged: new Set(),
+    cells: []
+  };
+
+  function key(row, col) {
+    return `${row},${col}`;
+  }
+
+  function setStatus(text) {
+    statusValue.textContent = text;
+  }
+
+  function updateStats() {
+    mineLeftValue.textContent = String(Math.max(0, state.mineCount - state.flags));
+    revealedValue.textContent = String(state.revealed);
+  }
+
+  function setActionMode(mode) {
+    state.actionMode = mode;
+    openBtn.classList.toggle('button-primary', mode === 'open');
+    openBtn.classList.toggle('button-secondary', mode !== 'open');
+    flagBtn.classList.toggle('button-primary', mode === 'flag');
+    flagBtn.classList.toggle('button-secondary', mode !== 'flag');
+    openBtn.setAttribute('aria-pressed', String(mode === 'open'));
+    flagBtn.setAttribute('aria-pressed', String(mode === 'flag'));
+  }
+
+  function clearBoard() {
+    state.cells.forEach((cell) => {
+      cell.className = 'ms-cell';
+      cell.textContent = '';
+      cell.disabled = false;
+      cell.removeAttribute('data-number');
+    });
+  }
+
+  function paintCell(row, col) {
+    const cell = state.cells[row * SIZE + col];
+    if (!(cell instanceof HTMLButtonElement)) return;
+
+    const cellKey = key(row, col);
+    const open = state.opened.has(cellKey);
+    const flagged = state.flagged.has(cellKey);
+    const mine = state.mines.has(cellKey);
+    const count = state.counts[row][col];
+
+    cell.className = 'ms-cell';
+    if (open) cell.classList.add('is-open');
+    if (flagged) cell.classList.add('is-flagged');
+    if (mine && state.gameOver) cell.classList.add('is-mine');
+    if (mine && state.gameOver && state.lastTriggerKey === cellKey) cell.classList.add('is-triggered');
+    if (open && count === 0) cell.classList.add('is-empty');
+    if (open && count > 0) {
+      cell.dataset.number = String(count);
+      cell.textContent = String(count);
+    } else if (flagged) {
+      cell.textContent = '⚑';
+    } else if (mine && state.gameOver) {
+      cell.textContent = '✹';
+    } else {
+      cell.textContent = '';
+    }
+    cell.disabled = state.gameOver || state.won || open;
+    cell.setAttribute('aria-label', `행 ${row + 1}, 열 ${col + 1}`);
+  }
+
+  function paintAllCells() {
+    for (let row = 0; row < SIZE; row += 1) {
+      for (let col = 0; col < SIZE; col += 1) {
+        paintCell(row, col);
+      }
+    }
+  }
+
+  function buildBoard() {
+    board.innerHTML = '';
+    state.cells = [];
+    for (let row = 0; row < SIZE; row += 1) {
+      for (let col = 0; col < SIZE; col += 1) {
+        const cell = document.createElement('button');
+        cell.type = 'button';
+        cell.className = 'ms-cell';
+        cell.setAttribute('aria-label', `행 ${row + 1}, 열 ${col + 1}`);
+        cell.addEventListener('click', () => {
+          if (state.actionMode === 'flag') {
+            toggleFlag(row, col);
+          } else {
+            revealCell(row, col);
+          }
+        });
+        cell.addEventListener('contextmenu', (event) => {
+          event.preventDefault();
+          toggleFlag(row, col);
+        });
+        board.appendChild(cell);
+        state.cells.push(cell);
+      }
+    }
+  }
+
+  function resetGame(nextMineCount = state.mineCount) {
+    state.mineCount = nextMineCount;
+    state.firstReveal = true;
+    state.gameOver = false;
+    state.won = false;
+    state.revealed = 0;
+    state.flags = 0;
+    state.mines = new Set();
+    state.counts = Array.from({ length: SIZE }, () => Array(SIZE).fill(0));
+    state.opened = new Set();
+    state.flagged = new Set();
+    state.lastTriggerKey = null;
+    mineSelect.value = String(nextMineCount);
+    setStatus('Ready');
+    updateStats();
+    clearBoard();
+  }
+
+  function placeMines(excludeRow, excludeCol) {
+    const safe = new Set();
+    for (let row = excludeRow - 1; row <= excludeRow + 1; row += 1) {
+      for (let col = excludeCol - 1; col <= excludeCol + 1; col += 1) {
+        if (row >= 0 && row < SIZE && col >= 0 && col < SIZE) {
+          safe.add(key(row, col));
+        }
+      }
+    }
+
+    while (state.mines.size < state.mineCount) {
+      const row = Math.floor(Math.random() * SIZE);
+      const col = Math.floor(Math.random() * SIZE);
+      const cellKey = key(row, col);
+      if (safe.has(cellKey) || state.mines.has(cellKey)) {
+        continue;
+      }
+      state.mines.add(cellKey);
+    }
+
+    for (let row = 0; row < SIZE; row += 1) {
+      for (let col = 0; col < SIZE; col += 1) {
+        const cellKey = key(row, col);
+        if (state.mines.has(cellKey)) continue;
+        let count = 0;
+        for (let r = row - 1; r <= row + 1; r += 1) {
+          for (let c = col - 1; c <= col + 1; c += 1) {
+            if (r === row && c === col) continue;
+            if (r < 0 || r >= SIZE || c < 0 || c >= SIZE) continue;
+            if (state.mines.has(key(r, c))) count += 1;
+          }
+        }
+        state.counts[row][col] = count;
+      }
+    }
+  }
+
+  function revealNeighbors(startRow, startCol) {
+    const stack = [[startRow, startCol]];
+    while (stack.length) {
+      const [row, col] = stack.pop();
+      if (row < 0 || row >= SIZE || col < 0 || col >= SIZE) continue;
+      const cellKey = key(row, col);
+      if (state.opened.has(cellKey) || state.flagged.has(cellKey)) continue;
+      if (state.mines.has(cellKey)) continue;
+
+      state.opened.add(cellKey);
+      state.revealed += 1;
+      const count = state.counts[row][col];
+      if (count === 0) {
+        for (let r = row - 1; r <= row + 1; r += 1) {
+          for (let c = col - 1; c <= col + 1; c += 1) {
+            if (r === row && c === col) continue;
+            stack.push([r, c]);
+          }
+        }
+      }
+    }
+  }
+
+  function winGame() {
+    state.won = true;
+    setStatus('Cleared');
+    paintAllCells();
+    updateStats();
+  }
+
+  function loseGame(triggerRow, triggerCol) {
+    state.gameOver = true;
+    state.lastTriggerKey = key(triggerRow, triggerCol);
+    setStatus('Boom');
+    state.mines.forEach((mineKey) => {
+      const [row, col] = mineKey.split(',').map((value) => Number(value));
+      const cell = state.cells[row * SIZE + col];
+      if (cell instanceof HTMLButtonElement) {
+        cell.classList.add('is-mine');
+        cell.textContent = '✹';
+      }
+    });
+    paintAllCells();
+  }
+
+  function revealCell(row, col) {
+    if (state.gameOver || state.won) return;
+    const cellKey = key(row, col);
+    if (state.flagged.has(cellKey) || state.opened.has(cellKey)) return;
+
+    if (state.firstReveal) {
+      placeMines(row, col);
+      state.firstReveal = false;
+      setStatus('Playing');
+    }
+
+    if (state.mines.has(cellKey)) {
+      loseGame(row, col);
+      return;
+    }
+
+    revealNeighbors(row, col);
+    paintAllCells();
+    updateStats();
+
+    if (state.revealed >= CELL_TOTAL - state.mineCount) {
+      winGame();
+    }
+  }
+
+  function toggleFlag(row, col) {
+    if (state.gameOver || state.won) return;
+    const cellKey = key(row, col);
+    if (state.opened.has(cellKey)) return;
+
+    if (state.flagged.has(cellKey)) {
+      state.flagged.delete(cellKey);
+      state.flags -= 1;
+    } else {
+      if (state.flags >= state.mineCount) return;
+      state.flagged.add(cellKey);
+      state.flags += 1;
+    }
+
+    paintCell(row, col);
+    updateStats();
+  }
+
+  newBtn.addEventListener('click', () => {
+    resetGame(Number(mineSelect.value) || 5);
+  });
+
+  mineSelect.addEventListener('change', () => {
+    resetGame(Number(mineSelect.value) || 5);
+  });
+
+  openBtn.addEventListener('click', () => {
+    setActionMode('open');
+  });
+
+  flagBtn.addEventListener('click', () => {
+    setActionMode('flag');
+  });
+
+  buildBoard();
+  resetGame(state.mineCount);
+  setActionMode('open');
 }
