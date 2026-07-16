@@ -3,69 +3,235 @@
 <head>
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
-  <title>Gyuhan | Professional Portfolio</title>
-  <meta name="description" content="반응형 개인 프로페셔널 웹사이트">
+  <title>Gyuhan | Matrix Portfolio</title>
+  <meta name="description" content="반응형 개인 프로페셔널 웹사이트와 지렁이 게임">
   <link rel="stylesheet" href="styles.css">
 </head>
 <body>
-  <a class="skip-link" href="#content">본문 바로가기</a>
-  <div class="page-shell">
-    <header class="site-header">
-      <div class="brand">
-        <span class="brand-mark">G</span>
-        <div>
-          <p class="brand-kicker">Professional Site</p>
-          <h1>Gyuhan</h1>
-        </div>
-      </div>
-      <button class="nav-toggle" type="button" aria-expanded="false" aria-controls="site-nav">Menu</button>
-      <nav id="site-nav" class="site-nav" aria-label="주요 메뉴">
-        <a href="#about">About</a>
-        <a href="#projects">Projects</a>
-        <a href="#games">Games</a>
-        <a href="#contact">Contact</a>
-      </nav>
-    </header>
+  <canvas id="matrix-canvas" aria-hidden="true"></canvas>
+  <div class="ambient ambient-a" aria-hidden="true"></div>
+  <div class="ambient ambient-b" aria-hidden="true"></div>
 
-    <main id="content">
-      <section class="hero panel">
+  <a class="skip-link" href="#content">본문 바로가기</a>
+
+  <header class="site-header">
+    <div class="brand">
+      <span class="brand-mark">G</span>
+      <div>
+        <p class="brand-kicker">Professional Site</p>
+        <h1>Gyuhan</h1>
+      </div>
+    </div>
+
+    <button class="nav-toggle" type="button" aria-expanded="false" aria-controls="site-nav">Menu</button>
+
+    <nav id="site-nav" class="site-nav" aria-label="주요 메뉴">
+      <a href="#home">Home</a>
+      <a href="#about">About</a>
+      <a href="#projects">Projects</a>
+      <a href="#experience">Experience</a>
+      <a href="#research">Research</a>
+      <a href="#games">Games</a>
+      <a href="#contact">Contact</a>
+    </nav>
+  </header>
+
+  <main id="content" class="site-main">
+    <section id="home" class="hero panel">
+      <div class="hero-copy">
         <p class="eyebrow">Matrix-inspired portfolio</p>
-        <h2>정적 프로페셔널 웹사이트의 첫 구조를 세웁니다.</h2>
-        <p class="lead">기존 콘텐츠는 보존하고, 반응형 내비게이션과 Games 영역의 진입점만 준비한 안전한 첫 루프입니다.</p>
+        <h2>정적 프로페셔널 웹사이트와 지렁이 게임을 한 화면에 담았습니다.</h2>
+        <p class="lead">확인된 정보만 사용하고, 미확인 항목은 <span class="placeholder">[사람 확인 필요]</span>로 남겨 안전하게 복구 가능한 구조로 구성했습니다.</p>
         <div class="hero-actions">
-          <a class="button button-primary" href="#games">View Games</a>
+          <a class="button button-primary" href="#games">Play Games</a>
           <a class="button button-secondary" href="#contact">Contact</a>
         </div>
-      </section>
-
-      <section class="panel split">
-        <article id="about">
-          <h2>About</h2>
-          <p>프로필 세부 내용은 CV 확인 후 반영합니다.</p>
+      </div>
+      <div class="hero-grid">
+        <article class="glass-card">
+          <span class="card-label">Stack</span>
+          <h3>HTML / CSS / JavaScript</h3>
+          <p>정적 사이트에 필요한 최소 기술만 사용합니다.</p>
         </article>
-        <article id="projects">
-          <h2>Projects</h2>
-          <p>[사람 확인 필요]</p>
+        <article class="glass-card">
+          <span class="card-label">Layout</span>
+          <h3>Responsive by default</h3>
+          <p>375px, 768px, 1440px 기준으로 안정적으로 보이도록 설계했습니다.</p>
+        </article>
+        <article class="glass-card">
+          <span class="card-label">Theme</span>
+          <h3>Matrix motion</h3>
+          <p>배경은 움직이는 매트릭스 비주얼로 처리합니다.</p>
+        </article>
+      </div>
+    </section>
+
+    <section id="about" class="panel section-split">
+      <div>
+        <p class="section-kicker">About</p>
+        <h2>현재는 구조를 먼저 안정화합니다.</h2>
+        <p>프로필 세부 내용은 CV 원문 확인 후 반영합니다.</p>
+      </div>
+      <div class="split-grid">
+        <article>
+          <h3>Profile</h3>
+          <p class="placeholder">[사람 확인 필요]</p>
         </article>
         <article>
-          <h2>Skills</h2>
-          <p>[사람 확인 필요]</p>
+          <h3>Focus</h3>
+          <p>반응형 UI, 상호작용, 게임 흐름, 배포 안정성을 우선합니다.</p>
         </article>
-      </section>
+      </div>
+    </section>
 
-      <section id="games" class="panel">
-        <h2>Games</h2>
-        <div class="game-placeholder">
-          <p>지렁이 게임은 다음 루프에서 구현합니다.</p>
+    <section id="projects" class="panel">
+      <div class="section-heading">
+        <div>
+          <p class="section-kicker">Projects</p>
+          <h2>확인 가능한 프로젝트만 표시합니다.</h2>
         </div>
-      </section>
+        <p class="section-note">프로젝트 설명은 CV 확인 후 확정합니다.</p>
+      </div>
+      <div class="card-grid three">
+        <article class="glass-card">
+          <h3>Selected Work</h3>
+          <p class="placeholder">[사람 확인 필요]</p>
+        </article>
+        <article class="glass-card">
+          <h3>Skills Snapshot</h3>
+          <p class="placeholder">[사람 확인 필요]</p>
+        </article>
+        <article class="glass-card">
+          <h3>Outcome</h3>
+          <p>현재 단계에서는 정적 사이트와 게임 기능 복구에 집중합니다.</p>
+        </article>
+      </div>
+    </section>
 
-      <section id="contact" class="panel contact-card">
-        <h2>Contact</h2>
-        <p>[사람 확인 필요]</p>
-      </section>
-    </main>
-  </div>
+    <section id="experience" class="panel">
+      <div class="section-heading">
+        <div>
+          <p class="section-kicker">Experience</p>
+          <h2>경력은 검증 후 채웁니다.</h2>
+        </div>
+        <p class="section-note">미확인 내용은 유지하지 않고 표시만 남깁니다.</p>
+      </div>
+      <div class="timeline">
+        <article class="timeline-item">
+          <span class="timeline-year">[사람 확인 필요]</span>
+          <h3>Role / Organization</h3>
+          <p>경력 항목은 CV 원문이 확인되면 교체합니다.</p>
+        </article>
+        <article class="timeline-item">
+          <span class="timeline-year">[사람 확인 필요]</span>
+          <h3>Role / Organization</h3>
+          <p>추가 경험도 동일한 기준으로 보존합니다.</p>
+        </article>
+      </div>
+    </section>
+
+    <section id="research" class="panel">
+      <div class="section-heading">
+        <div>
+          <p class="section-kicker">Research</p>
+          <h2>확인 가능한 탐구 영역만 남깁니다.</h2>
+        </div>
+        <p class="section-note">현재는 자리만 만들고, 내용은 검증 후 입력합니다.</p>
+      </div>
+      <div class="card-grid two">
+        <article class="glass-card">
+          <h3>Research Note</h3>
+          <p class="placeholder">[사람 확인 필요]</p>
+        </article>
+        <article class="glass-card">
+          <h3>Research Note</h3>
+          <p class="placeholder">[사람 확인 필요]</p>
+        </article>
+      </div>
+    </section>
+
+    <section id="games" class="panel game-panel">
+      <div class="section-heading">
+        <div>
+          <p class="section-kicker">Games</p>
+          <h2>지렁이 게임</h2>
+        </div>
+        <p class="section-note">키보드, WASD, 모바일 버튼으로 조작합니다.</p>
+      </div>
+
+      <div class="game-layout">
+        <div class="game-stage">
+          <canvas id="snake-canvas" aria-label="지렁이 게임 보드"></canvas>
+          <div id="game-overlay" class="game-overlay">
+            <span class="overlay-title">Ready</span>
+            <p>Start 버튼을 누르거나 Enter를 눌러 시작하세요.</p>
+          </div>
+        </div>
+
+        <aside class="game-sidebar">
+          <div class="score-grid">
+            <article class="score-card">
+              <span>Score</span>
+              <strong id="score-value">0</strong>
+            </article>
+            <article class="score-card">
+              <span>Best</span>
+              <strong id="best-value">0</strong>
+            </article>
+            <article class="score-card">
+              <span>Status</span>
+              <strong id="status-value">Ready</strong>
+            </article>
+          </div>
+
+          <div class="control-row">
+            <button id="start-btn" class="button button-primary" type="button">Start</button>
+            <button id="pause-btn" class="button button-secondary" type="button">Pause</button>
+            <button id="restart-btn" class="button button-secondary" type="button">Restart</button>
+          </div>
+
+          <div class="game-notes">
+            <p>음식을 먹으면 성장하고 점수가 올라갑니다.</p>
+            <p>벽, 자기 몸, 적과 충돌하면 게임 오버입니다.</p>
+            <p>적 5개는 랜덤 이동하고 5초마다 폭발 후 다시 생성됩니다.</p>
+          </div>
+
+          <div class="d-pad" aria-label="모바일 방향 버튼">
+            <button data-direction="up" class="d-pad-up" type="button">▲</button>
+            <button data-direction="left" class="d-pad-left" type="button">◀</button>
+            <button data-direction="down" class="d-pad-down" type="button">▼</button>
+            <button data-direction="right" class="d-pad-right" type="button">▶</button>
+          </div>
+        </aside>
+      </div>
+    </section>
+
+    <section id="contact" class="panel">
+      <div class="section-heading">
+        <div>
+          <p class="section-kicker">Contact</p>
+          <h2>배포와 저장소 정보</h2>
+        </div>
+        <p class="section-note">연락처 세부값은 CV 확인 후 채웁니다.</p>
+      </div>
+      <div class="card-grid two">
+        <article class="glass-card">
+          <h3>GitHub Pages</h3>
+          <a href="https://gyuhan2.github.io" target="_blank" rel="noreferrer">https://gyuhan2.github.io</a>
+        </article>
+        <article class="glass-card">
+          <h3>Repository</h3>
+          <a href="https://github.com/gyuhan2/gyuhan2.github.io.git" target="_blank" rel="noreferrer">github.com/gyuhan2/gyuhan2.github.io.git</a>
+        </article>
+      </div>
+      <p class="contact-footnote">[사람 확인 필요] 연락처 정보는 CV 원문을 확인한 뒤 반영합니다.</p>
+    </section>
+  </main>
+
+  <footer class="site-footer">
+    <p>Matrix portfolio shell with snake game and responsive navigation.</p>
+  </footer>
+
   <script src="script.js" defer></script>
 </body>
 </html>
