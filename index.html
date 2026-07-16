@@ -204,12 +204,6 @@
             <p>Shift를 누르고 있는 동안 지렁이가 2배 더 빠르게 움직입니다.</p>
           </div>
 
-          <div class="d-pad" aria-label="모바일 방향 버튼">
-            <button data-direction="up" class="d-pad-up" type="button">▲</button>
-            <button data-direction="left" class="d-pad-left" type="button">◀</button>
-            <button data-direction="down" class="d-pad-down" type="button">▼</button>
-            <button data-direction="right" class="d-pad-right" type="button">▶</button>
-          </div>
         </aside>
       </div>
 
@@ -219,7 +213,7 @@
             <p class="section-kicker">Minesweeper</p>
             <h2 id="minesweeper-title">지뢰찾기 게임</h2>
           </div>
-          <p class="section-note">20 x 20 보드와 5 / 10 / 20 지뢰 선택을 지원합니다.</p>
+          <p class="section-note">Playing Time</p>
         </div>
 
         <div class="minesweeper-layout">
@@ -228,9 +222,9 @@
               <label class="field">
                 <span>Mine Count</span>
                 <select id="mine-count-select" aria-label="지뢰 개수 선택">
-                  <option value="5">5</option>
-                  <option value="10">10</option>
-                  <option value="20">20</option>
+                  <option value="50">50</option>
+                  <option value="100">100</option>
+                  <option value="150">150</option>
                 </select>
               </label>
               <button id="minesweeper-new-btn" class="button button-primary" type="button">New Game</button>
@@ -241,7 +235,7 @@
             <div class="score-grid minesweeper-stats">
               <article class="score-card">
                 <span>Mines Left</span>
-                <strong id="mine-left-value">5</strong>
+                <strong id="mine-left-value">50</strong>
               </article>
               <article class="score-card">
                 <span>Revealed</span>

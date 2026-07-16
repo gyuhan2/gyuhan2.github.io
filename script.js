@@ -808,7 +808,7 @@ function setupMinesweeperGame() {
   const SIZE = 20;
   const CELL_TOTAL = SIZE * SIZE;
   const state = {
-    mineCount: Number(mineSelect.value) || 5,
+    mineCount: Number(mineSelect.value) || 50,
     actionMode: 'open',
     firstReveal: true,
     gameOver: false,
@@ -1062,11 +1062,11 @@ function setupMinesweeperGame() {
   }
 
   newBtn.addEventListener('click', () => {
-    resetGame(Number(mineSelect.value) || 5);
+    resetGame(Number(mineSelect.value) || 50);
   });
 
   mineSelect.addEventListener('change', () => {
-    resetGame(Number(mineSelect.value) || 5);
+    resetGame(Number(mineSelect.value) || 50);
   });
 
   openBtn.addEventListener('click', () => {
