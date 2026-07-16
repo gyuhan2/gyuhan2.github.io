@@ -125,6 +125,7 @@ function setupSnakeGame() {
     snake: [],
     direction: { x: 1, y: 0 },
     queuedDirection: null,
+    shiftHeld: false,
     food: { x: 0, y: 0 },
     enemies: [],
     burstActive: false
@@ -177,7 +178,7 @@ function setupSnakeGame() {
   }
 
   function clearTimers() {
-    if (gameTimer) clearInterval(gameTimer);
+    if (gameTimer) clearTimeout(gameTimer);
     if (enemyTimer) clearInterval(enemyTimer);
     if (burstTimer) clearInterval(burstTimer);
     if (recoverTimer) clearTimeout(recoverTimer);
@@ -273,9 +274,24 @@ function setupSnakeGame() {
 
   function startTimers() {
     clearTimers();
-    gameTimer = setInterval(gameStep, STEP_MS);
+    scheduleGameTick();
     enemyTimer = setInterval(moveEnemies, ENEMY_STEP_MS);
     burstTimer = setInterval(triggerEnemyBurst, ENEMY_BURST_MS);
+  }
+
+  function scheduleGameTick() {
+    if (gameTimer) {
+      clearTimeout(gameTimer);
+      gameTimer = null;
+    }
+    if (state.mode !== 'playing') return;
+    gameTimer = setTimeout(() => {
+      gameTimer = null;
+      gameStep();
+      if (state.mode === 'playing') {
+        scheduleGameTick();
+      }
+    }, state.shiftHeld ? STEP_MS / 2 : STEP_MS);
   }
 
   function startGame() {
@@ -541,7 +557,20 @@ function setupSnakeGame() {
     }
   }
 
+  function setShiftBoost(active) {
+    if (state.shiftHeld === active) return;
+    state.shiftHeld = active;
+    if (state.mode === 'playing') {
+      scheduleGameTick();
+    }
+  }
+
   document.addEventListener('keydown', (event) => {
+    if (event.key === 'Shift') {
+      setShiftBoost(true);
+      return;
+    }
+
     const direction = mapDirection(event.key);
     if (direction) {
       event.preventDefault();
@@ -581,6 +610,12 @@ function setupSnakeGame() {
       startGame();
     }
   }, { passive: false });
+
+  document.addEventListener('keyup', (event) => {
+    if (event.key === 'Shift') {
+      setShiftBoost(false);
+    }
+  });
 
   startBtn.addEventListener('click', () => {
     if (state.mode === 'playing') return;
